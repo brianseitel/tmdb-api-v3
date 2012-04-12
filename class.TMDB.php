@@ -3,7 +3,7 @@
 class TMDB {
 	
 	const VERSION = 3;
-	const BASE_URL = 'http://api.themoviedb.org/';
+	const BASE_URL = 'api.themoviedb.org';
 
 	protected static $api_key = '';
 
@@ -77,7 +77,7 @@ class TMDB {
 	 * @param float $rating - the rating between 1 and 10
 	 * @return  Array - a json_decoded result set
 	 */
-	public function add_rating($movie_id, float $rating = 0.0) {
+	public function add_rating($movie_id, float $rating) {
 		if (!is_numeric($rating) || $rating < 1 || $rating > 10) 
 			return array('error' => 'Rating must be a float value between 1 an 10');
 		
@@ -179,7 +179,7 @@ class TMDB {
 	 * @return  String - the full URL
 	 */
 	public function url($path) {
-		$url = self::BASE_URL.self::VERSION."{$path}?api_key=".self::$api_key;
+		$url = self::BASE_URL.'/'.self::VERSION."{$path}?api_key=".self::$api_key;
 		return str_replace('//', '/', $url);
 	}
 }
