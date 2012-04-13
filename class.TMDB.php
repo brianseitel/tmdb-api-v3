@@ -1,14 +1,30 @@
 <?
 
-class TMDB {
+/** @preserve
+*
+* TMDB API Wrapper v3.0
+* A PHP wrapper to interface with The Movie Database's API
+* http://github.com/brianseitel/tmdb-v3-api
+*
+* Copyright 2011, Brian Seitel
+* Dual licensed under the MIT or GPL Version 2 licenses.
+* http://jquery.org/license
+*
+* For API documentation, see the README file
+* http://github.com/brianseitel
+*
+* Date: April 12, 2012
+*/
+
+class TMDBv3 {
 	
 	const VERSION = 3;
 	const BASE_URL = 'api.themoviedb.org';
 
 	protected static $api_key = '';
 
-	public function __construct($api_key) {
-		self::$api_key = $api_key;
+	public function __construct() {
+		self::$api_key = TMDB_API_KEY;
 	}
 
 	/**
