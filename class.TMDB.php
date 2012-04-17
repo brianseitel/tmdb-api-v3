@@ -22,17 +22,55 @@ class TMDBv3 {
 	const BASE_URL = 'api.themoviedb.org';
 
 	protected static $api_key = '';
+	public $image_base_path;
+	public $sizes = array(
+		'poster' => '',
+		'backdrop' => '',
+		'profile' => ''
+	);
 
 	public function __construct() {
 		self::$api_key = TMDB_API_KEY;
+		$this->fetch_configuration();
 	}
 
+	public function fetch_configuration() {
+		$results = $this->send_request('/configuration');
+		$results = $results['images'];
+		// Get poster sizes
+		$poster_sizes = $results['poster_sizes'];
+
+		if (in_array('w185', $poster_sizes))
+			$this->sizes['poster'] = 'w185';
+		else
+			$this->sizes['poster'] = array_shift(array_shift($poster_sizes));
+		
+		// Get backdrop sizes
+		$backdrop_sizes = $results['backdrop_sizes'];
+
+		// Get the biggest non-original one for bandwidth or whatever,
+		// and fall back on original
+		if (in_array('w1280', $backdrop_sizes))
+			$this->sizes['backdrop'] = 'w1280';
+		else
+			$this->sizes['backdrop'] = 'original';
+
+		// Get profile sizes. Start with w185 and fall back to original.
+		$profile_sizes = $results['profile_sizes'];
+		if (in_array('w185', $profile_sizes))
+			$this->sizes['profile'] = 'w185';
+		else
+			$this->sizes['profile'] = 'original';
+
+		$this->image_base_path = $results['base_url'];
+	}
+	
 	/**
 	 * Search for a movie
 	 * @param string $query The search query
 	 * @return Array - a json_decoded result set
 	 */
-	public function search_for_movie(string $query) {
+	public function search_for_movie($query) {
 		$params = array('query' => $query);
 		return $this->send_request('/search/movie', $params);
 	}
@@ -111,6 +149,16 @@ class TMDBv3 {
 			return array('error' => 'Rating must be a float value between 1 an 10');
 		
 		return $this->send_request('/movie/'.$movie_id.'/rating', array('value' => $rating), 'POST');
+	}
+
+	/**
+	 * Constructs the image path
+	 * @param String $path Path provided by API response
+	 * @return  String full image path
+	 */
+	public function get_image_path($path, $type = 'poster') {
+		if (!$path) return '';
+		return preg_replace('/http:\/\/([\/\/]+)/', '/', $this->image_base_path.'/'.$this->sizes[$type].'/'.$path);
 	}
 
 	/**
