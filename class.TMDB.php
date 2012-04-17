@@ -80,7 +80,7 @@ class TMDBv3 {
 	 * @param string $query the search term
 	 * @return Array - a json_decoded result set
 	 */
-	public function search_for_person(string $query) {
+	public function search_for_person($query) {
 		$params = array('query' => $query);
 		return $this->send_request('/search/person', $params);
 	}
@@ -91,7 +91,7 @@ class TMDBv3 {
 	 * @param int $id The movie ID
 	 * @param mixed $parts The different parts to request
 	 */
-	public function get_movie_batch(int $id, array $parts) {
+	public function get_movie_batch($id, array $parts) {
 		$data = array('core' => $this->get_movie($id));
 		foreach ($parts as $part) {
 			$data[$part] = $this->get_movie($id, $part);
@@ -103,7 +103,7 @@ class TMDBv3 {
 	 * @param int $id The ID of the collection to fetch
 	 * @return Array - a json_decoded result set
 	 */ 
-	public function get_collection(int $id) {
+	public function get_collection($id) {
 		return $this->__request($id, 'collection');
 	}
 
@@ -113,7 +113,7 @@ class TMDBv3 {
 	 * @param string $part - The part of the movie to fetch. Defaults to core.
 	 * @return  Array - a json_decoded result set
 	 */
-	public function get_movie(int $id, string $part = null) {
+	public function get_movie($id, $part = null) {
 		return $this->__request($id, 'movie', $part);
 	}
 
@@ -124,7 +124,7 @@ class TMDBv3 {
 	 * @return  Array - a json_decoded result set
 	 */
 
-	public function get_person(int $id, string $part = null) {
+	public function get_person($id, $part = null) {
 		return $this->__request($id, 'person', $part);
 	}
 
@@ -134,7 +134,7 @@ class TMDBv3 {
 	 * @param string $part - The part of the company to fetch. Defaults to core.
 	 * @return  Array - a json_decoded result set
 	 */
-	public function get_company(int $id, string $part = null) {
+	public function get_company($id, $part = null) {
 		return $this->__request($id, 'company', $part);
 	}
 
@@ -144,7 +144,7 @@ class TMDBv3 {
 	 * @param float $rating - the rating between 1 and 10
 	 * @return  Array - a json_decoded result set
 	 */
-	public function add_rating(int $movie_id, float $rating) {
+	public function add_rating($movie_id, $rating) {
 		if (!is_numeric($rating) || $rating < 1 || $rating > 10) 
 			return array('error' => 'Rating must be a float value between 1 an 10');
 		
@@ -200,7 +200,7 @@ class TMDBv3 {
 	 * @param string $part The part of the API to query
 	 * @return Array a json_decoded result set
 	 */
-	public function __request(int $id, string $object, string $part = null) {
+	public function __request($id, $object, $part = null) {
 		return $this->send_request('/'.$object.'/'.$id.($part ? '/'.$part : ''));
 	}
 	
@@ -211,7 +211,7 @@ class TMDBv3 {
 	 * @param $method - Whether to POST, GET, PUT or DELETE. Defaults to GET
 	 * @return Array - a json_decoded array of the result set
 	 */
-	public function send_request(string $path, array $params = array(), string $method = 'GET') {
+	public function send_request($path, array $params = array(), $method = "GET") {
 		$url = $this->url($path);
 
 		$ch = curl_init();
@@ -249,13 +249,12 @@ class TMDBv3 {
 		return json_decode($results, 1);
 	}
 
-
 	/**
 	 * A helper function to generate the full URL
 	 * @param $path - the path in the API (e.g., movie/search')
 	 * @return  String - the full URL
 	 */
-	public function url(string $path) {
+	public function url($path) {
 		$url = self::BASE_URL.'/'.self::VERSION."{$path}?api_key=".self::$api_key;
 		return str_replace('//', '/', $url);
 	}
